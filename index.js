@@ -28,11 +28,20 @@ function transferContent(arrayBuffer, wasm_inflate, wasm) {
   const file_buffer = new Uint8Array(arrayBuffer);
   wasm_buffer.set(file_buffer, start);
   console.log("Inflating ...");
-  const t0 = performance.now();
-  wasm_inflate.inflate();
-  const t1 = performance.now();
+  inflate(wasm_inflate.inflate_bytes.bind(wasm_inflate), "inflate_bytes");
+  inflate(wasm_inflate.deflate_decoder.bind(wasm_inflate), "deflate_decoder");
+  inflate(wasm_inflate.deflate_decoder_buf.bind(wasm_inflate), "deflate_decoder_buf");
+  inflate(wasm_inflate.inflate_stream.bind(wasm_inflate), "inflate_stream");
+  inflate(wasm_inflate.inflate_writer.bind(wasm_inflate), "inflate_writer");
+  inflate(wasm_inflate.libflate.bind(wasm_inflate), "libflate");
   console.log("Done");
-  console.log("Inflating took " + (t1 - t0) + " milliseconds.");
+}
+
+function inflate(f, name) {
+  const t0 = performance.now();
+  f();
+  const t1 = performance.now();
+  console.log(name + ": " + (t1 - t0) + " milliseconds.");
 }
 
 run();

@@ -1,6 +1,6 @@
-use inflate::DeflateDecoder;
+use inflate::{DeflateDecoder, DeflateDecoderBuf, InflateStream, InflateWriter};
 use libflate::deflate;
-use std::io::Read;
+use std::io::{Read, Write};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -25,11 +25,52 @@ impl WasmInflate {
         self.file_buffer.as_ptr()
     }
 
-    pub fn inflate(&mut self) -> u8 {
+    pub fn inflate_bytes(&mut self) -> u8 {
+        let _output = inflate::inflate_bytes(self.file_buffer.as_slice()).expect("inflate_bytes");
+        42
+    }
+
+    pub fn deflate_decoder(&mut self) -> u8 {
         let mut output = Vec::new();
-        // let mut deflate_decoder = DeflateDecoder::new(self.file_buffer.as_slice());
-        let mut deflate_decoder = deflate::Decoder::new(self.file_buffer.as_slice());
-        deflate_decoder.read_to_end(&mut output).expect("error");
+        let mut decoder = DeflateDecoder::new(self.file_buffer.as_slice());
+        decoder.read_to_end(&mut output).expect("error");
+        42
+    }
+
+    pub fn deflate_decoder_buf(&mut self) -> u8 {
+        let mut output = Vec::new();
+        let mut decoder = DeflateDecoderBuf::new(self.file_buffer.as_slice());
+        decoder.read_to_end(&mut output).expect("error");
+        42
+    }
+
+    pub fn inflate_stream(&mut self) -> u8 {
+        let mut output = Vec::new();
+        let mut inflate_stream = InflateStream::new();
+        let buffer_slice = self.file_buffer.as_slice();
+        let mut n = 0;
+        while n < buffer_slice.len() {
+            if let Ok((nb_read, res)) = inflate_stream.update(buffer_slice) {
+                n += nb_read;
+                output.extend(res.iter().cloned());
+            } else {
+                break;
+            }
+        }
+        42
+    }
+
+    pub fn inflate_writer(&mut self) -> u8 {
+        let mut writer = InflateWriter::new(Vec::new());
+        writer.write(self.file_buffer.as_slice()).expect("write");
+        let _decoded = writer.finish().expect("finish");
+        42
+    }
+
+    pub fn libflate(&mut self) -> u8 {
+        let mut output = Vec::new();
+        let mut decoder = deflate::Decoder::new(self.file_buffer.as_slice());
+        decoder.read_to_end(&mut output).expect("error");
         42
     }
 }
