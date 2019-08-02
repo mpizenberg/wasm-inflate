@@ -34,6 +34,7 @@ function transferContent(arrayBuffer, wasm_inflate, wasm) {
   inflate(wasm_inflate.inflate_stream.bind(wasm_inflate), "inflate_stream");
   inflate(wasm_inflate.inflate_writer.bind(wasm_inflate), "inflate_writer");
   inflate(wasm_inflate.libflate.bind(wasm_inflate), "libflate");
+  inflate(wasm_inflate.miniz_oxide.bind(wasm_inflate), "miniz_oxide");
   console.log("Done");
 }
 

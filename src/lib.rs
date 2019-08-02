@@ -1,5 +1,6 @@
 use inflate::{DeflateDecoder, DeflateDecoderBuf, InflateStream, InflateWriter};
 use libflate::deflate;
+use miniz_oxide;
 use std::io::{Read, Write};
 use wasm_bindgen::prelude::*;
 
@@ -71,6 +72,12 @@ impl WasmInflate {
         let mut output = Vec::new();
         let mut decoder = deflate::Decoder::new(self.file_buffer.as_slice());
         decoder.read_to_end(&mut output).expect("error");
+        42
+    }
+
+    pub fn miniz_oxide(&mut self) -> u8 {
+        let _output_7 =
+            miniz_oxide::inflate::decompress_to_vec(self.file_buffer.as_slice()).expect("7");
         42
     }
 }

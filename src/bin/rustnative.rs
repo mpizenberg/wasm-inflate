@@ -1,5 +1,6 @@
 use inflate::{DeflateDecoder, DeflateDecoderBuf, InflateStream, InflateWriter};
 use libflate::deflate;
+use miniz_oxide;
 use std::time::SystemTime;
 use std::{fs, io::Read, io::Write};
 
@@ -59,4 +60,9 @@ fn main() {
     let mut libflate_decoder = deflate::Decoder::new(buffer.as_slice());
     libflate_decoder.read_to_end(&mut output_6).expect("6");
     println!("Elapsed (libflate): {:?}", now.elapsed());
+
+    // 7. miniz_oxide (s native, s wasm)
+    let now = SystemTime::now();
+    let _output_7 = miniz_oxide::inflate::decompress_to_vec(buffer.as_slice()).expect("7");
+    println!("Elapsed (miniz_oxide): {:?}", now.elapsed());
 }
